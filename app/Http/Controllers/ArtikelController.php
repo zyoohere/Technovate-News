@@ -21,6 +21,7 @@ class ArtikelController extends Controller
         return Inertia::render('Home', [
             'artikels' => $posts,
             'categories' => $categories,
+            'tags' => Tag::all(),
         ]);
     }
 

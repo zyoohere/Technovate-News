@@ -22,9 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
         'role',
         'status',
-        'avatar',
         'google_id',
     ];
 
@@ -50,5 +50,63 @@ class User extends Authenticatable
             'password' => 'hashed',
             'status' => 'boolean',
         ];
+    }
+    /**
+     * Get the user's avatar URL.
+     *
+     * @return string
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
+    }
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
+    /**
+     * Get the user's role.
+     *
+     * @return string
+     */
+    public function getRoleAttribute(): string
+    {
+        return $this->roles->first()->name ?? 'User';
+    }
+    /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+    /**
+     * Check if the user is a writer.
+     *
+     * @return bool
+     */
+    public function isWriter(): bool
+    {
+        return $this->hasRole('writer');
+    }
+    /**
+     * Check if the user is a guest.
+     *
+     * @return bool
+     */
+    public function isGuest(): bool
+    {
+        return $this->hasRole('guest');
     }
 }
