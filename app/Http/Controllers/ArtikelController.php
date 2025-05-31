@@ -11,17 +11,16 @@ use Inertia\Inertia;
 
 class ArtikelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Artikel::with('category', 'user')
+        $artikels = Artikel::with(['category', 'user'])
             ->where('status', 'published')
-            ->latest('published_at')
-            ->paginate(10);
+            ->latest()->paginate(6)->withQueryString(); // paginate 6 artikel per halaman
         $categories = Category::all();
-        return Inertia::render('Home', [
-            'artikels' => $posts,
+
+        return Inertia::render('Artikel', [
+            'artikels' => $artikels,
             'categories' => $categories,
-            'tags' => Tag::all(),
         ]);
     }
 
@@ -39,13 +38,21 @@ class ArtikelController extends Controller
         $tags = Tag::whereHas('artikels', function ($query) use ($posts) {
             $query->where('artikel_id', $posts->id);
         })->get();
-        $relatedArticles = Artikel::latest()->take(3)->with(['category', 'user'])->get();
+        $relatedArticles = Artikel::where('category_id', $posts->category_id)
+            ->where('id', '!=', $posts->id)
+            ->latest()
+            ->take(3)
+            ->get();
+        $latestArticles = Artikel::latest()->take(5)->get();
         return Inertia::render('ArtikelPage', [
             'artikels' => $posts,
             'categories' => $categories,
             'comments' => $comments,
             'tags' => $tags,
             'relatedArticles' => $relatedArticles,
+            'hastag' => Tag::all(),
+            'latestArticles' => $latestArticles,
+
         ]);
     }
 

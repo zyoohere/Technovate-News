@@ -13,7 +13,7 @@ class CategoryController extends Controller
      */
     public function index($slug)
     {
-    //    
+        //    
     }
 
     /**
@@ -37,13 +37,14 @@ class CategoryController extends Controller
      */
     public function show($slug)
     {
-         $category = Category::where('slug', $slug)->firstOrFail();
-          $artikels = $category->artikels()
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $artikels = $category->artikels()
+            ->with('user')
             ->where('status', 'published')
             ->latest()
             ->get();
 
-          return Inertia::render('CategoryPage', [
+        return Inertia::render('CategoryPage', [
             'category' => $category,
             'artikels' => $artikels,
             'categories' => Category::all(),

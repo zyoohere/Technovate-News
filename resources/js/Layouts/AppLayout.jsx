@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { Search, Moon, Sun, Menu, X, LogIn, UserPlus, PencilLine, User, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Moon, Sun, Menu, X, LogIn, UserPlus, User, LogOut, ChevronDown } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
+import Footer from '@/Components/Footer';
 
 export default function AppLayout({ children, categories }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -10,8 +11,8 @@ export default function AppLayout({ children, categories }) {
     const user = auth?.user;
     const userDropdownRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(); // Renamed for clarity
-    const mobileMenuRef = useRef(); // Ref for mobile menu
+    const dropdownRef = useRef();
+    const mobileMenuRef = useRef();
     const { data, setData, get } = useForm({ q: '' });
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -21,7 +22,6 @@ export default function AppLayout({ children, categories }) {
         }
         return false;
     });
-
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -45,7 +45,6 @@ export default function AppLayout({ children, categories }) {
                 setIsUserDropdownOpen(false);
             }
             if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-
             }
         }
 
@@ -64,25 +63,21 @@ export default function AppLayout({ children, categories }) {
     const toggleDarkMode = () => {
         setDarkMode(prevMode => !prevMode);
     };
-
     return (
         <div className="min-h-screen flex flex-col bg-lightBg text-darkText dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
-            <header className="bg-white dark:bg-background-dark shadow sticky top-0 z-50"> {/* Using `white` for light mode header */}
+            <header className="bg-white dark:bg-background-dark shadow sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                    {/* Logo and Site Title */}
                     <Link href="/" className="flex items-center gap-3 flex-shrink-0">
                         <img
                             src="/images/Logoicon.png"
                             alt="Technovate Logo"
-                            className="h-12 w-12 rounded-full shadow-md dark:bg-surface-light" // Adjusted dark mode background
+                            className="h-12 w-12 rounded-full shadow-md dark:bg-surface-light" 
                         />
                         <span className="text-2xl font-extrabold tracking-wide text-darkText dark:text-gray-100 uppercase">
                             Technovate
                         </span>
                     </Link>
-
-                    {/* Desktop Search Bar */}
-                    <div className="hidden md:flex flex-1 max-w-lg mx-6 relative"> {/* Increased max-width */}
+                    <div className="hidden md:flex flex-1 max-w-lg mx-6 relative"> 
                         <form onSubmit={handleSearch} className="w-full flex items-center">
                             <input
                                 type="text"
@@ -100,23 +95,19 @@ export default function AppLayout({ children, categories }) {
                             </button>
                         </form>
                     </div>
-
-                    {/* Desktop Navigation & User Menu */}
-                    <nav className="hidden md:flex items-center gap-4"> {/* Adjusted gap for better spacing */}
-                        {/* Dark Mode Toggle */}
+                    <nav className="hidden md:flex items-center gap-4"> 
                         <button
                             onClick={toggleDarkMode}
-                            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" // Rounded-full, better hover
+                            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                         >
-                            {darkMode ? <Moon size={20} className="text-indigo-300" /> : <Sun size={20} className="text-orange-400" />} {/* Added color to icons */}
+                            {darkMode ? <Moon size={20} className="text-indigo-300" /> : <Sun size={20} className="text-orange-400" />}
                         </button>
-                        {/* Auth Buttons / User Dropdown */}
                         {!user ? (
                             <>
                                 <Link
                                     href="/login"
-                                    className="px-5 py-2 bg-primary text-white rounded-full font-semibold hover:bg-indigo-700 transition shadow-md" // Rounded-full, better hover
+                                    className="px-5 py-2 bg-primary text-white rounded-full font-semibold hover:bg-indigo-700 transition shadow-md" 
                                 >
                                     Masuk
                                 </Link>
@@ -144,7 +135,6 @@ export default function AppLayout({ children, categories }) {
                                         </div>
                                     )}
                                 </button>
-
                                 {isUserDropdownOpen && (
                                     <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in-down" // Added shadow-xl, fade-in animation (requires custom keyframes)
                                     >
@@ -153,26 +143,34 @@ export default function AppLayout({ children, categories }) {
                                             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                                         </div>
                                         <ul className="text-sm text-darkText dark:text-gray-200 py-1">
-                                            <li>
-                                                <Link href="/artikel/tulis" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition" onClick={() => setIsUserDropdownOpen(false)}>
-                                                    <span className="flex items-center gap-2">✍️ Tulis Artikel</span>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition" onClick={() => setIsUserDropdownOpen(false)}>
-                                                    <span className="flex items-center gap-2">👤 Profil</span>
-                                                </Link>
-                                            </li>
+                                           
                                             <li>
                                                 <Link
-                                                    href={route('logout')} // Use route helper for consistency
-                                                    method="post"
-                                                    as="button"
-                                                    className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-700 transition"
-                                                    onClick={() => setIsUserDropdownOpen(false)}
-                                                >
-                                                    ➡️ Logout
-                                                </Link>
+                                                href="/profile"
+                                                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition rounded"
+                                                onClick={() => {
+                                                    setIsOpen(false);
+                                                    setIsMobileMenuOpen(false);
+                                                }}
+                                            >
+                                                <User className="w-4 h-4" />
+                                                Profil
+                                            </Link>
+                                            </li>
+                                            <li>
+                                               <Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-700 transition rounded"
+                                                onClick={() => {
+                                                    setIsOpen(false);
+                                                    setIsMobileMenuOpen(false);
+                                                }}
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                                Logout
+                                            </Link>
                                             </li>
                                         </ul>
                                     </div>
@@ -180,8 +178,6 @@ export default function AppLayout({ children, categories }) {
                             </div>
                         )}
                     </nav>
-
-                    {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-2">
                         <button
                             onClick={toggleDarkMode}
@@ -196,16 +192,15 @@ export default function AppLayout({ children, categories }) {
                             aria-label="Toggle mobile menu"
                             aria-expanded={isMobileMenuOpen}
                         >
-                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />} {/* Using Lucide icons for consistency */}
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />} 
                         </button>
                     </div>
                 </div>
-
-                {/* Desktop Category Navigation */}
-                <nav className="hidden md:flex justify-center bg-primary text-white py-3 space-x-8 font-semibold shadow-inner"> {/* Added shadow-inner */}
-                    <Link href="/" className="hover:text-secondary transition text-sm"> {/* Adjusted text size */}
+                <nav className="hidden md:flex justify-center bg-primary text-white py-3 space-x-8 font-semibold shadow-inner"> 
+                    <Link href="/" className="hover:text-secondary transition text-sm">
                         Beranda
                     </Link>
+                    
                     {categories.map((cat) => (
                         <Link
                             key={cat.id}
@@ -215,15 +210,15 @@ export default function AppLayout({ children, categories }) {
                             {cat.nama}
                         </Link>
                     ))}
+                    <Link href="/media" className="hover:text-secondary transition text-sm">
+                        Media
+                    </Link>
                     <Link href="/Technovate-profile" className="hover:text-secondary transition text-sm">
                         Tentang Kami
                     </Link>
                 </nav>
-
-                {/* Mobile Menu Content */}
                 {isMobileMenuOpen && (
                     <div ref={mobileMenuRef} className="md:hidden bg-white dark:bg-gray-800 shadow-lg px-6 pt-4 pb-6 border-t border-gray-200 dark:border-gray-700 space-y-6">
-                        {/* Mobile Search Bar */}
                         <form onSubmit={handleSearch} className="w-full flex items-center relative mb-4">
                             <input
                                 type="text"
@@ -240,7 +235,6 @@ export default function AppLayout({ children, categories }) {
                                 <Search size={18} />
                             </button>
                         </form>
-
                         <ul className="space-y-4 text-center font-medium text-darkText dark:text-gray-100">
                             <li>
                                 <Link
@@ -272,8 +266,6 @@ export default function AppLayout({ children, categories }) {
                                 </Link>
                             </li>
                         </ul>
-
-                        {/* Mobile Auth Buttons / User Menu */}
                         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                             {!user ? (
                                 <div className="space-y-3 px-4">
@@ -321,17 +313,7 @@ export default function AppLayout({ children, categories }) {
                                     </div>
                                     {isOpen && (
                                         <div className="mt-2 space-y-1">
-                                            <Link
-                                                href="/artikel/tulis"
-                                                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition rounded"
-                                                onClick={() => {
-                                                    setIsOpen(false);
-                                                    setIsMobileMenuOpen(false);
-                                                }}
-                                            >
-                                                <PencilLine className="w-4 h-4" />
-                                                Tulis Artikel
-                                            </Link>
+                                           
                                             <Link
                                                 href="/profile"
                                                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition rounded"
@@ -364,61 +346,13 @@ export default function AppLayout({ children, categories }) {
                     </div>
                 )}
             </header>
-                        <Toaster position="top-right" reverseOrder={false} /> {/* Added Toaster for notifications */}
+            <Toaster position="top-right" reverseOrder={false} />
 
             {/* Main Content */}
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">{children}</main> {/* Adjusted padding for better responsiveness */}
+            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">{children}</main> 
 
             {/* Footer */}
-            <footer className="bg-white text-darkText py-10 mt-auto border-t-4 border-primary dark:bg-gray-800 dark:text-gray-200 dark:border-primary"> {/* Adjusted colors for better dark mode */}
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center md:items-start gap-8"> {/* Added gap */}
-                    {/* Brand Info */}
-                    <div className="text-center md:text-left mb-6 md:mb-0">
-                        <div className="text-2xl font-semibold text-primary">Technovate</div> {/* Applied primary color */}
-                        <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">Portal Berita Terpercaya di Indonesia</p>
-                        <div className="mt-4 text-gray-500 dark:text-gray-400">
-                            <span>&copy; {new Date().getFullYear()} Technovate. All rights reserved.</span> {/* Dynamic year */}
-                        </div>
-                    </div>
-
-                    {/* Category Links */}
-                    <div className="text-center md:text-left mb-6 md:mb-0">
-                        <div className="font-semibold mb-3 text-lg text-primary">Kategori</div> {/* Applied primary color, larger font */}
-                        <ul className="space-y-2 text-sm">
-                            {categories.map((cat) => (
-                                <li key={cat.id}>
-                                    <Link
-                                        href={`/artikel/kategori/${cat.slug || cat.id}`}
-                                        className="hover:text-primary transition text-gray-700 dark:text-gray-300" // Adjusted hover/default text color
-                                    >
-                                        {cat.nama}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Social Media Links */}
-                    <div className="text-center md:text-left mb-6 md:mb-0">
-                        <div className="font-semibold mb-3 text-lg text-primary">Ikuti Kami</div> {/* New heading, primary color */}
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-primary transition text-gray-700 dark:text-gray-300 flex items-center gap-2"><img src="/icons/facebook.svg" alt="Facebook" className="h-5 w-5 invert dark:invert-0" /> Facebook</a></li> {/* Placeholder for icons */}
-                            <li><a href="#" className="hover:text-primary transition text-gray-700 dark:text-gray-300 flex items-center gap-2"><img src="/icons/twitter.svg" alt="Twitter" className="h-5 w-5 invert dark:invert-0" /> Twitter</a></li>
-                            <li><a href="#" className="hover:text-primary transition text-gray-700 dark:text-gray-300 flex items-center gap-2"><img src="/icons/instagram.svg" alt="Instagram" className="h-5 w-5 invert dark:invert-0" /> Instagram</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Contact Info */}
-                    <div className="mt-6 md:mt-0 text-center md:text-left">
-                        <div className="font-semibold mb-3 text-lg text-primary">Kontak</div> {/* Primary color, larger font */}
-                        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li><a href="mailto:contact@technovate.com" className="hover:text-primary transition">Email: contact@technovate.com</a></li>
-                            <li><a href="tel:+628123456789" className="hover:text-primary transition">Telp: +62 812 3456 789</a></li>
-                            <li>Jl. Contoh No. 123, Bandung, Indonesia</li> {/* Added address */}
-                        </ul>
-                    </div>
-                </div>
-            </footer>
+            <Footer categories={categories} />
         </div>
     );
 }

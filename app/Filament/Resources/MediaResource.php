@@ -3,15 +3,22 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MediaResource\Pages;
-use App\Filament\Resources\MediaResource\RelationManagers;
 use App\Models\Media;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 
 class MediaResource extends Resource
 {
@@ -26,13 +33,25 @@ class MediaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\TextInput::make('caption')
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\TextInput::make('type')
+                TextInput::make('title')
+                    ->label('Judul Media')
+                    ->required(),
+                Textarea::make('caption')
+                    ->label('Judul/Caption')
+                    ->required(),
+                Select::make('uploader.roles.name')
+                    ->label('Uploader')
+                    ->relationship(
+                        name: 'uploader',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn($query) => $query->whereHas('roles', function ($q) {
+                            $q->whereIn('name', ['Super Admin', 'Author']);
+                        }),
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Radio::make('type')
                     ->label('Tipe Media')
                     ->options([
                         'image' => 'Gambar',
@@ -41,24 +60,29 @@ class MediaResource extends Resource
                     ])
                     ->reactive()
                     ->required(),
-                Forms\Components\TextInput::make('media_path')
+
+                FileUpload::make('media_path')
                     ->label('Unggah File')
+                    ->multiple()
+                    ->directory('media')
+                    ->reorderable()
+                    ->required()
                     ->disk('public')
                     ->directory('media')
                     ->preserveFilenames()
                     ->visible(fn($get) => in_array($get('type'), ['image', 'video']))
                     ->required(fn($get) => in_array($get('type'), ['image', 'video'])),
-                Forms\Components\TextInput::make('media_url')
+
+                TextInput::make('media_url')
                     ->label('Tautan Eksternal')
                     ->url()
                     ->visible(fn($get) => $get('type') === 'external')
-                    ->required(fn($get) => $get('type') === 'external')
-                    ->default(null),
-                Forms\Components\Toggle::make('is_featured')
-                    ->required(),
-                Forms\Components\TextInput::make('uploaded_by')
-                    ->numeric()
-                    ->default(null),
+                    ->required(fn($get) => $get('type') === 'external'),
+
+                Toggle::make('is_featured')
+                    ->label('Tampilkan di Beranda'),
+
+
             ]);
     }
 
@@ -66,20 +90,22 @@ class MediaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('caption')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type'),
-                Tables\Columns\TextColumn::make('media_path')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('media_url')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('is_featured')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('uploaded_by')
-                    ->numeric()
-                    ->sortable(),
+                ImageColumn::make('media_path')
+                    ->label('Media')
+                    ->disk('public') // Pastikan ini sesuai disk
+                    ->visibility('visible')
+                    ->height(80)
+                    ->stacked()
+                    ->limit(3)
+                    ->limitedRemainingText()
+                    ->circular(false),
+
+                TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('caption')->limit(30),
+                TextColumn::make('type')->badge(),
+                TextColumn::make('uploader.name')->label('Uploader'),
+                ToggleColumn::make('is_featured'),
+                TextColumn::make('created_at')->dateTime('d M Y'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

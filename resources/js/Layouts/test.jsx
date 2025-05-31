@@ -1,102 +1,66 @@
-import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
-import { Moon, Sun,Search } from "lucide-react";
+import { Bell } from 'lucide-react';
 
-export default function AppLayout({ children }) {
-  const { auth } = usePage().props;
-  const [darkMode, setDarkMode] = useState(false);
+// Tambahkan di props komponen: { children, categories, notifications = [] }
+export default function AppLayout({ children, categories, notifications = [] }) {
+    // ...state lain
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+    const notifRef = useRef();
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark", !darkMode);
-  };
+    // Tutup dropdown jika klik di luar
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (notifRef.current && !notifRef.current.contains(event.target)) {
+                setIsNotifOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
-  return (
-    <div className="flex flex-col min-h-screen bg-background dark:bg-background-dark text-text-default dark:text-text-dark">
-      {/* Header */}
-      <header className="bg-surface-light dark:bg-surface-dark shadow sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-extrabold tracking-wide text-text-default dark:text-text-dark">
-            Technovate
-          </Link>
-
-          {/* Search bar */}
-          <div className="relative w-full max-w-md mx-4">
-            <input
-              type="text"
-              placeholder="Cari artikel..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-default dark:text-text-dark placeholder:text-text-light dark:placeholder:text-text-soft"
-            />
-            <span className="absolute left-3 top-2.5 text-text-light dark:text-text-soft">
-              <Search/>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Toggle Dark Mode */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-md hover:bg-primary/10 dark:hover:bg-primaryHover/20 transition"
-            >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-
-            {/* Auth */}
-            {!auth.user ? (
-              <>
-                <Link
-                  href="/login"
-                  className="px-5 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primaryHover transition"
-                >
-                  Masuk
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-5 py-2 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/10 transition"
-                >
-                  Daftar
-                </Link>
-              </>
-            ) : (
-              <div className="relative group">
-                <button className="flex items-center gap-2 font-semibold">
-                  {auth.user.name}
-                </button>
-                <div className="absolute right-0 mt-2 w-56 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg shadow-lg z-50 hidden group-hover:block">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 hover:bg-primary/10 dark:hover:bg-primaryHover/10 transition"
-                  >
-                    Profil
-                  </Link>
-                  <Link
-                    href="/logout"
-                    method="post"
-                    className="block px-4 py-2 hover:bg-primary/10 dark:hover:bg-primaryHover/10 transition"
-                  >
-                    Keluar
-                  </Link>
+    // ...return JSX
+    return (
+        // ...
+        <nav className="hidden md:flex items-center gap-4">
+            {/* Notifikasi */}
+            {user && (
+                <div className="relative" ref={notifRef}>
+                    <button
+                        onClick={() => setIsNotifOpen(!isNotifOpen)}
+                        className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                        aria-label="Notifikasi"
+                    >
+                        <Bell size={20} />
+                        {notifications.length > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5">
+                                {notifications.length}
+                            </span>
+                        )}
+                    </button>
+                    {isNotifOpen && (
+                        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50">
+                            <div className="p-4 border-b border-gray-200 dark:border-gray-700 font-semibold">
+                                Notifikasi
+                            </div>
+                            <ul className="max-h-80 overflow-y-auto">
+                                {notifications.length === 0 ? (
+                                    <li className="p-4 text-gray-500 dark:text-gray-400 text-sm text-center">
+                                        Tidak ada notifikasi baru.
+                                    </li>
+                                ) : (
+                                    notifications.map((notif, idx) => (
+                                        <li key={idx} className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                                            <div className="text-sm">{notif.message}</div>
+                                            <div className="text-xs text-gray-400 mt-1">{notif.time}</div>
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+                    )}
                 </div>
-              </div>
             )}
-          </div>
-        </div>
-      </header>
-
-      {/* Main */}
-      <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
-
-      {/* Footer */}
-      <footer className="bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-soft py-10 mt-auto border-t border-border-light dark:border-border-dark">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm">&copy; {new Date().getFullYear()} Technovate. Semua Hak Dilindungi.</p>
-          <div className="mt-4 flex justify-center gap-6 text-sm">
-            <a href="#" className="hover:text-primary transition">Tentang Kami</a>
-            <a href="#" className="hover:text-primary transition">Kontak</a>
-            <a href="#" className="hover:text-primary transition">Privasi</a>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+            {/* ...lanjutkan dengan darkmode/user menu */}
+        </nav>
+        // ...
+    );
 }

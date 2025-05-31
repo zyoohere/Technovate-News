@@ -4,33 +4,25 @@ use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ErrController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Artikel;
 use App\Models\Category;
-use App\Models\Tag;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
 
-Route::get('/', [ArtikelController::class, 'index'])->name('Home');
-Route::get('/artikel/{slug}', [ArtikelController::class, 'show']);
+Route::get('/', [HomeController::class, 'index'])->name('Home');
+Route::get('/search', [ArtikelController::class, 'search'])->name('articles.search');
+Route::get('/artikel', [ArtikelController::class, 'index'])->name('articles.index');
+Route::get('/artikel/{slug}', [ArtikelController::class, 'show'])->name('articles.show');
 Route::post('/artikel/komentar', [CommentController::class, 'store']);
 Route::get('/artikel/kategori/{slug}', [CategoryController::class, 'show']);
+Route::get('/media', [MediaController::class, 'index'])->name('media.index');
 
-
-Route::get('/search', [ArtikelController::class, 'search'])->name('articles.search');
 Route::fallback([ErrController::class, 'notFound']);
 Route::get('/error-500', [ErrController::class, 'ServerError']);
-
 Route::get('/Technovate-profile', function () {
     return Inertia::render('CompanyProfile', [
         'categories' => Category::all(),

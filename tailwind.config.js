@@ -17,33 +17,31 @@ export default {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                primary: "#009990", // Teal dari logo Technovate
-                primaryHover: "#007f7a", // Versi hover yang lebih gelap dari teal
-                secondary: "#06b6d4", // Cyan yang segar sebagai aksen
+                primary: "#0C5552", // Teal dari logo Technovate
+                primaryHover: "#0F766E", // Versi hover yang lebih gelap dari teal
+                secondary: "#1BC5B4", // Cyan yang segar sebagai aksen
                 background: {
-                    DEFAULT: "#f9fafb", // Gray-50 (background umum light mode)
-                    dark: "#111827", // Gray-900 (dark mode)
+                    DEFAULT: "#FCFCFC",
+                    dark: "#111827", 
                 },
                 surface: {
-                    light: "#ffffff", // Putih untuk kartu/light mode
+                    light: "#FCFCFC", // Putih untuk kartu/light mode
                     dark: "#1f2937", // Gray-800 untuk kartu di dark mode
                 },
                 text: {
-                    DEFAULT: "#1f2937", // Gray-800 (teks utama light mode)
-                    light: "#6b7280", // Gray-500 (teks sekunder light mode)
-                    dark: "#f3f4f6", // Gray-100 (teks utama dark mode)
-                    soft: "#9ca3af", // Gray-400 (teks sekunder dark mode)
+                    light: "#0E8388", 
+                    dark: "#02C087", 
                 },
                 success: "#22c55e", // Green-500
                 warning: "#facc15", // Amber-400
                 danger: "#ef4444", // Red-500
                 border: {
-                    light: "#e5e7eb", // Gray-200
-                    dark: "#374151", // Gray-700
+                    light: "#0E8388", 
+                    dark: "#374151", 
                 },
             },
         },
     },
 
-    plugins: [forms, require("@tailwindcss/line-clamp")],
+    plugins: [forms, require("@tailwindcss/line-clamp"), require('@tailwindcss/typography')],
 };

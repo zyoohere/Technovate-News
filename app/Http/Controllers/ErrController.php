@@ -10,7 +10,7 @@ class ErrController extends Controller
 {
      public function notFound(Request $request)
     {
-        return Inertia::render('Err404', [
+        return Inertia::render('Errors/Err404', [
             'categories' => Category::all(),
         ])->toResponse($request)->setStatusCode(404);
     }
